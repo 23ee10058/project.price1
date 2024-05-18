@@ -1,0 +1,48 @@
+import streamlit as st
+import pickle
+import sklearn
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import OneHotEncoder
+
+st.title('House price')
+df=pd.read_csv("C:\\Users\\sahoo\\OneDrive\\文档\\Bengaluru_House_Data.csv")
+list=df['location'].values.tolist()
+lr=LinearRegression()
+x_train=pickle.load(open('x_train.pkl', 'rb'))
+y_train=pickle.load(open('y_train.pkl', 'rb'))
+lr.fit(x_train,y_train)
+
+
+
+
+
+option = st.selectbox(
+    "Enter Location",
+    (list))
+
+title = st.text_input("Square Ft Per BHK", "")
+title1 = st.text_input("Bathroom per BHK", "")
+title2 = st.text_input("Bedroom per BHK", "")
+lis1=[option]
+lis2=[title]
+y=pd.DataFrame(lis2,columns=['perbhk'])
+x=pd.DataFrame(lis1,columns=['location'])
+z=x+y
+ohe=OneHotEncoder(sparse_output=False)
+z['location'][0]=option
+z['perbhk'][0]=title
+z['location']=ohe.fit_transform(z[['location']])
+
+st.write(z)
+
+
+
+def predict(z):
+    y_pred = lr.predict(z)
+    return y_pred
+
+
+if st.button("PREDICTION", type="primary"):
+    st.write(-1*predict(z))
+
